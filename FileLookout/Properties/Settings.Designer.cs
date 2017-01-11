@@ -25,13 +25,14 @@ namespace FileLookout.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("")]
-        public string watchedFolder {
+        [global::System.Configuration.DefaultSettingValueAttribute("<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<ArrayOfString xmlns:xsi=\"http://www.w3." +
+            "org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" />")]
+        public global::System.Collections.Specialized.StringCollection watchedFolders {
             get {
-                return ((string)(this["watchedFolder"]));
+                return ((global::System.Collections.Specialized.StringCollection)(this["watchedFolders"]));
             }
             set {
-                this["watchedFolder"] = value;
+                this["watchedFolders"] = value;
             }
         }
     }

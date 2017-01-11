@@ -13,7 +13,8 @@ namespace FileLookout
 {
     public partial class MainForm : Form
     {
-        private string watchedFolderPath;
+        private List<WatchedFolder> watchedFolders = new List<WatchedFolder>();
+        private BindingSource watchedFoldersBinding = new BindingSource();
 
         private Icon notifyNothingIcon;
         private Icon notifySomethingIcon;
@@ -23,11 +24,19 @@ namespace FileLookout
         {
             InitializeComponent();
 
+            // Connecte les données avec l'affichage des répertoires.
+            watchedFoldersBinding.DataSource = watchedFolders;
+            watchedFolderList.DataSource = watchedFoldersBinding;
+            watchedFolderList.DisplayMember = "Path";
+
             notifyNothingIcon = ((System.Drawing.Icon)(Properties.Resources.FileLookoutIcon));
             notifySomethingIcon = ((System.Drawing.Icon)(Properties.Resources.FileLookoutExclamationIcon));
 
-            watchedFolderPath = Properties.Settings.Default.watchedFolder;
-            SetupFolderWatching(watchedFolderPath);
+            foreach (var folder in Properties.Settings.Default.watchedFolders)
+            {
+                AddFolderToWatchList(folder);
+            }
+            watchedFoldersBinding.ResetBindings(false);
 
             notifyIcon.Icon = notifyNothingIcon;
             notifyIcon.Visible = true;
@@ -35,34 +44,36 @@ namespace FileLookout
             CheckWatchedFolderState();
         }
 
-        private void WatchedFolderButton_Click(object sender, EventArgs e)
+
+        private void AddFolderButton_Click(object sender, EventArgs e)
         {
             FolderBrowserDialog fbd = new FolderBrowserDialog();
-            if (Directory.Exists(watchedFolderPath))
-                fbd.SelectedPath = watchedFolderPath;
             fbd.ShowNewFolderButton = false;
 
             var result = fbd.ShowDialog();
 
             if (result == DialogResult.OK)
             {
-                watchedFolderPath = fbd.SelectedPath;
+                AddFolderToWatchList(fbd.SelectedPath);
+                watchedFoldersBinding.ResetBindings(false);
 
-                SetupFolderWatching(watchedFolderPath);
-
-                // Sauvegarde des paramètres
-                // TODO: Mettre ailleurs ?
-                Properties.Settings.Default.watchedFolder = watchedFolderPath;
-                Properties.Settings.Default.Save();
+                //// Sauvegarde des paramètres
+                SaveParameters();
             }
         }
 
-        private void SetupFolderWatching(string watchedFolderPath)
+        private void DeleteFolderButton_Click(object sender, EventArgs e)
         {
-            WatchedFolderText.Text = watchedFolderPath;
+            var selectedFolder = (WatchedFolder)watchedFolderList.SelectedItem;
+            watchedFolders.Remove(selectedFolder);
+            watchedFoldersBinding.ResetBindings(false);
 
-            // Mise à jour de la surveillance du répertoire.
-            folderWatcherObect.Path = watchedFolderPath;
+            // Faut arrêter de watcher le répertoire.
+            // TODO: Automatiser dans un destructeur, voir IDisposable.
+            selectedFolder.Dispose();
+
+            //// Sauvegarde des paramètres
+            SaveParameters();
         }
 
         // Appelé lors de la détection de la création s'un fichier.
@@ -70,15 +81,14 @@ namespace FileLookout
         {
             CheckWatchedFolderState();
 
-            notifyIcon.ShowBalloonTip(50000, "Nouveaux fichiers", "De nouveaux fichiers sont apparus dans le répertoire.", ToolTipIcon.Info);
-        }
+            String filepath = System.IO.Path.GetDirectoryName(e.FullPath);
+            String filename = System.IO.Path.GetFileName(e.FullPath);
 
-        private void notifyIcon_Click(object sender, EventArgs e)
-        {
-            if (watchedFolderPath.Length > 0 && Directory.Exists(watchedFolderPath))
-            {
-                Process.Start(watchedFolderPath);
-            }
+            String title = "Nouveaux fichiers";
+            String message = String.Format("De nouveaux fichiers sont apparus dans le répertoire {0}.\n\n{1}",
+                filepath, filename);
+            
+            notifyIcon.ShowBalloonTip(0, title, message, ToolTipIcon.Info);
         }
 
         private void folderWatcherObect_Deleted(object sender, FileSystemEventArgs e)
@@ -86,35 +96,111 @@ namespace FileLookout
             CheckWatchedFolderState();
         }
 
+        private void notifyIcon_Click(object sender, EventArgs e)
+        {
+            ShowInfoWindow();
+        }
+
         /// <summary>
-        ///  Vérifie le contenu du répertoire surveillé et ajuste l'icône de notification en conséquence.
+        ///  Vérifie les répertoires surveillés et ajuste l'icône de notification en conséquence.
         /// </summary>
         private void CheckWatchedFolderState()
         {
+            int fileCount = 0;
+
             // TODO: as-t'on besoin d'un try/catch ?
 
-            if (Directory.Exists(watchedFolderPath) && Directory.EnumerateFileSystemEntries(watchedFolderPath).Any())
+            foreach (var folder in watchedFolders)
             {
-                // Le répertoire semble contenir des fichiers. 
-                notifyIcon.Icon = notifySomethingIcon;
-
-                notifyIcon.Text = string.Format("FileLookup\n\n{0}: {1} éléments.",
-                    watchedFolderPath, 
-                    Directory.EnumerateFileSystemEntries(watchedFolderPath).Count());
+                if (!Directory.Exists(folder.Path))
+                {
+                    // Le répertoire n'existe plus.
+                    // TODO: avertir l'usager.
+                }
+                else if (!folder.Empty)
+                {
+                    fileCount += folder.FileCount;
+                }
             }
-            else
+
+            string text = "";
+            if (watchedFolders.Count==0)
             {
                 // Rien dans le répertoire.
                 notifyIcon.Icon = notifyNothingIcon;
-
-                notifyIcon.Text = string.Format("FileLookup\n\n{0}: aucun fichier.", watchedFolderPath);
+                text = "FileLookup: Aucun répertoire spécifié.";
             }
+            else if (fileCount > 0)
+            {
+                // Rien dans le répertoire.
+                notifyIcon.Icon = notifyNothingIcon;
+                text = "FileLookup: aucun fichier.";
+            }
+            else if (fileCount>0)
+            {
+                notifyIcon.Icon = notifySomethingIcon;
+
+                if (fileCount==1)
+                    text = String.Format("FileLookup: un fichier trouvé.");
+                else
+                    text = String.Format("FileLookup: {0] fichiers trouvés.", fileCount);
+            }
+
+            notifyIcon.Text = text;
+        }
+
+        /// <summary>
+        ///  Vérifie les répertoires surveillés et ajuste l'icône de notification en conséquence.
+        /// </summary>
+        private void ShowInfoWindow()
+        {
+            var dlg = new InfoForm(watchedFolders);
+            dlg.Show();
         }
 
         private void CheckButton_Click(object sender, EventArgs e)
         {
-            // notifyIcon.
-            //MessageBox.Show("test", "tester", MessageBoxButtons.OK, MessageBoxIcon.Information, MessageBoxDefaultButton.Button1, MessageBoxOptions.ServiceNotification);
+            CheckWatchedFolderState();
+            ShowInfoWindow();
+        }
+
+        /// <summary>
+        /// Ajout le répertoire spécifié par «path» à la liste des répertoies.
+        /// 
+        /// NB: il faut ensuite appeler watchedFoldersBinding.ResetBindings(false);
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        private WatchedFolder AddFolderToWatchList(string path)
+        {
+            WatchedFolder newWatchedFolder = null;
+            // TODO: Verifier si le répertoire existe ?
+
+            if (path.Length > 0 && Directory.Exists(path))
+            {
+                newWatchedFolder = new WatchedFolder { Path = path };
+                watchedFolders.Add(newWatchedFolder);
+
+                // TODO: aller dans une fonction newWatchedFolder ?
+                newWatchedFolder.WatcherObject.Filter = "*.*";
+                newWatchedFolder.WatcherObject.Created += new FileSystemEventHandler(folderWatcherObect_Created);
+                newWatchedFolder.WatcherObject.Deleted += new FileSystemEventHandler(folderWatcherObect_Deleted);
+                newWatchedFolder.WatcherObject.EnableRaisingEvents = true;
+            }
+
+            return newWatchedFolder;
+        }
+
+        private void SaveParameters()
+        {
+            Properties.Settings.Default.watchedFolders.Clear();
+
+            foreach (var folder in watchedFolders)
+            {
+                Properties.Settings.Default.watchedFolders.Add(folder.Path);
+            }
+
+            Properties.Settings.Default.Save();
         }
     }
 }
