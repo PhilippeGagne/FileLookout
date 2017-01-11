@@ -20,9 +20,12 @@ namespace FileLookout
         private Icon notifySomethingIcon;
         // TODO: icone interrogation quand le répertoire n'est pas spécifié ou n'existe pas.
 
+
         public MainForm()
         {
             InitializeComponent();
+
+ //           dlg = new InfoForm(watchedFolders);
 
             // Connecte les données avec l'affichage des répertoires.
             watchedFoldersBinding.DataSource = watchedFolders;
@@ -155,7 +158,7 @@ namespace FileLookout
         private void ShowInfoWindow()
         {
             var dlg = new InfoForm(watchedFolders);
-            dlg.Show();
+            dlg.ShowDialog();
         }
 
         private void CheckButton_Click(object sender, EventArgs e)

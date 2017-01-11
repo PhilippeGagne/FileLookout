@@ -33,11 +33,14 @@
             // 
             // FolderInfoList
             // 
+            this.FolderInfoList.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.FolderInfoList.FormattingEnabled = true;
             this.FolderInfoList.ItemHeight = 16;
             this.FolderInfoList.Location = new System.Drawing.Point(13, 13);
             this.FolderInfoList.Name = "FolderInfoList";
-            this.FolderInfoList.Size = new System.Drawing.Size(257, 196);
+            this.FolderInfoList.Size = new System.Drawing.Size(1031, 500);
             this.FolderInfoList.TabIndex = 0;
             this.FolderInfoList.DoubleClick += new System.EventHandler(this.FolderInfoList_DoubleClick);
             // 
@@ -45,7 +48,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(282, 253);
+            this.ClientSize = new System.Drawing.Size(1056, 568);
             this.Controls.Add(this.FolderInfoList);
             this.Name = "InfoForm";
             this.Text = "Informations";

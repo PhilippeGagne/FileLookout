@@ -36,5 +36,10 @@ namespace FileLookout
                 Process.Start(selectedFolder.Path);
             }
         }
+
+        public void UpdateData()
+        {
+            watchedFoldersBinding.ResetBindings(false);
+        }
     }
 }
