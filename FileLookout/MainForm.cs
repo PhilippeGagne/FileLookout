@@ -20,12 +20,15 @@ namespace FileLookout
         private Icon notifySomethingIcon;
         // TODO: icone interrogation quand le répertoire n'est pas spécifié ou n'existe pas.
 
+        private InfoForm informationForm = null;
 
         public MainForm()
         {
             InitializeComponent();
 
- //           dlg = new InfoForm(watchedFolders);
+            // Fenêtre des informations.
+            informationForm = new InfoForm(watchedFolders);
+            informationForm.Hide();
 
             // Connecte les données avec l'affichage des répertoires.
             watchedFoldersBinding.DataSource = watchedFolders;
@@ -39,14 +42,22 @@ namespace FileLookout
             {
                 AddFolderToWatchList(folder);
             }
-            watchedFoldersBinding.ResetBindings(false);
+            UpdateData();
 
             notifyIcon.Icon = notifyNothingIcon;
             notifyIcon.Visible = true;
 
-            CheckWatchedFolderState();
+            UpdateSystemTrayIconTextAndIcon();
         }
 
+        /// <summary>
+        /// Mise à jour des informations de bindings pour toutes les fenêtres qui en utilisent.
+        /// </summary>
+        private void UpdateData()
+        {
+            watchedFoldersBinding.ResetBindings(false);
+            informationForm.UpdateData();
+        }
 
         private void AddFolderButton_Click(object sender, EventArgs e)
         {
@@ -58,7 +69,7 @@ namespace FileLookout
             if (result == DialogResult.OK)
             {
                 AddFolderToWatchList(fbd.SelectedPath);
-                watchedFoldersBinding.ResetBindings(false);
+                UpdateData();
 
                 //// Sauvegarde des paramètres
                 SaveParameters();
@@ -69,7 +80,7 @@ namespace FileLookout
         {
             var selectedFolder = (WatchedFolder)watchedFolderList.SelectedItem;
             watchedFolders.Remove(selectedFolder);
-            watchedFoldersBinding.ResetBindings(false);
+            UpdateData();
 
             // Faut arrêter de watcher le répertoire.
             // TODO: Automatiser dans un destructeur, voir IDisposable.
@@ -79,24 +90,50 @@ namespace FileLookout
             SaveParameters();
         }
 
+        // This delegate enables asynchronous calls for processing Directory events.
+        delegate void DirectoryWatcherEventDelegate(object sender, FileSystemEventArgs e);
+
         // Appelé lors de la détection de la création s'un fichier.
         private void folderWatcherObect_Created(object sender, FileSystemEventArgs e)
         {
-            CheckWatchedFolderState();
+            if (this.InvokeRequired)
+            {
+                DirectoryWatcherEventDelegate d = new DirectoryWatcherEventDelegate(folderWatcherObect_Created);
+                this.Invoke(d, new object[] { sender, e });
+            }
+            else
+            {
+                UpdateSystemTrayIconTextAndIcon();
 
-            String filepath = System.IO.Path.GetDirectoryName(e.FullPath);
-            String filename = System.IO.Path.GetFileName(e.FullPath);
+                // Faire apparaître une notification temporaire.
+                String filepath = System.IO.Path.GetDirectoryName(e.FullPath);
+                String filename = System.IO.Path.GetFileName(e.FullPath);
 
-            String title = "Nouveaux fichiers";
-            String message = String.Format("De nouveaux fichiers sont apparus dans le répertoire {0}.\n\n{1}",
-                filepath, filename);
-            
-            notifyIcon.ShowBalloonTip(0, title, message, ToolTipIcon.Info);
+                String title = "Nouveaux fichiers";
+                String message = String.Format("De nouveaux fichiers sont apparus dans le répertoire {0}.\n\n{1}",
+                    filepath, filename);
+
+                notifyIcon.ShowBalloonTip(0, title, message, ToolTipIcon.Info);
+
+                // Mise à jour des informations affichées.
+                UpdateData();
+            }
         }
 
         private void folderWatcherObect_Deleted(object sender, FileSystemEventArgs e)
         {
-            CheckWatchedFolderState();
+            if (this.InvokeRequired)
+            {
+                DirectoryWatcherEventDelegate d = new DirectoryWatcherEventDelegate(folderWatcherObect_Deleted);
+                this.Invoke(d, new object[] { sender, e });
+            }
+            else
+            {
+                UpdateSystemTrayIconTextAndIcon();
+
+                // Mise à jour des informations affichées.
+                UpdateData();
+            }
         }
 
         private void notifyIcon_Click(object sender, EventArgs e)
@@ -107,7 +144,8 @@ namespace FileLookout
         /// <summary>
         ///  Vérifie les répertoires surveillés et ajuste l'icône de notification en conséquence.
         /// </summary>
-        private void CheckWatchedFolderState()
+        /// TODO: Mauvais nom. Sert à ajuster l'icône et le texte de la zone de notification.
+        private void UpdateSystemTrayIconTextAndIcon()
         {
             int fileCount = 0;
 
@@ -119,6 +157,7 @@ namespace FileLookout
                 {
                     // Le répertoire n'existe plus.
                     // TODO: avertir l'usager.
+                    // UpdateData();
                 }
                 else if (!folder.Empty)
                 {
@@ -131,7 +170,7 @@ namespace FileLookout
             {
                 // Rien dans le répertoire.
                 notifyIcon.Icon = notifyNothingIcon;
-                text = "FileLookup: Aucun répertoire spécifié.";
+                text = "FileLookup: aucun répertoire spécifié.";
             }
             else if (fileCount > 0)
             {
@@ -144,9 +183,9 @@ namespace FileLookout
                 notifyIcon.Icon = notifySomethingIcon;
 
                 if (fileCount==1)
-                    text = String.Format("FileLookup: un fichier trouvé.");
+                    text = String.Format("FileLookup: un seul fichier.");
                 else
-                    text = String.Format("FileLookup: {0] fichiers trouvés.", fileCount);
+                    text = String.Format("FileLookup: {0} fichiers.", fileCount);
             }
 
             notifyIcon.Text = text;
@@ -157,13 +196,35 @@ namespace FileLookout
         /// </summary>
         private void ShowInfoWindow()
         {
-            var dlg = new InfoForm(watchedFolders);
-            dlg.ShowDialog();
+            // Mise à jour des informations.
+            UpdateData();
+
+            // S'assure que la fenêtre est visible.
+            FormWindowState previousWindowState = informationForm.WindowState;
+
+            if (previousWindowState == FormWindowState.Minimized)
+                informationForm.WindowState = FormWindowState.Normal;
+
+            //            informationForm.WindowState = FormWindowState.Minimized;
+            informationForm.Show();
+            informationForm.Activate();
+
+//            informationForm.WindowState = FormWindowState.Normal;
+
+//            if (previousWindowState == FormWindowState.Maximized)
+//                informationForm.WindowState = FormWindowState.Maximized;
+
+            // get our current "TopMost" value (ours will always be false though)
+//            bool top = informationForm.TopMost;
+            // make our form jump to the top of everything
+//            informationForm.TopMost = true;
+            // set it back to whatever it was
+ //           informationForm.TopMost = top;
         }
 
         private void CheckButton_Click(object sender, EventArgs e)
         {
-            CheckWatchedFolderState();
+            UpdateSystemTrayIconTextAndIcon();
             ShowInfoWindow();
         }
 

@@ -41,5 +41,20 @@ namespace FileLookout
         {
             watchedFoldersBinding.ResetBindings(false);
         }
+
+        /// <summary>
+        /// On va avoir une seule fenêtre toujours ouverte. L'usager de la
+        /// ferme pas mais il la cache.
+        /// </summary>
+        /// <param name="e"></param>
+        protected override void OnFormClosing(FormClosingEventArgs e)
+        {
+            base.OnFormClosing(e);
+            if (e.CloseReason == CloseReason.UserClosing)
+            {
+                e.Cancel = true;
+                Hide();
+            }
+        }
     }
 }
