@@ -16,9 +16,13 @@ namespace FileLookout
         private List<WatchedFolder> watchedFolders;
         private BindingSource watchedFoldersBinding = new BindingSource();
 
-        public InfoForm(List<WatchedFolder> items)
+        private List<WatchedFile> watchedFiles;
+        private BindingSource watchedFilesBinding = new BindingSource();
+
+        public InfoForm(List<WatchedFolder> items, List<WatchedFile> files)
         {
             watchedFolders = items;
+            watchedFiles = files;
 
             InitializeComponent();
 
@@ -26,6 +30,9 @@ namespace FileLookout
             watchedFoldersBinding.DataSource = watchedFolders;
             FolderInfoList.DataSource = watchedFoldersBinding;
             FolderInfoList.DisplayMember = "DisplayState";
+
+            watchedFilesBinding.DataSource = watchedFiles;
+            FileEventsDataView.DataSource = watchedFilesBinding;
         }
 
         private void FolderInfoList_DoubleClick(object sender, EventArgs e)
@@ -40,6 +47,7 @@ namespace FileLookout
         public void UpdateData()
         {
             watchedFoldersBinding.ResetBindings(false);
+            watchedFilesBinding.ResetBindings(false);
         }
 
         /// <summary>
@@ -55,6 +63,11 @@ namespace FileLookout
                 e.Cancel = true;
                 Hide();
             }
+        }
+
+        private void FileEventsDataView_CellContentClick(object sender, DataGridViewCellEventArgs e)
+        {
+
         }
     }
 }

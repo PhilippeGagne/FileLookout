@@ -13,7 +13,11 @@ namespace FileLookout
 {
     public partial class MainForm : Form
     {
+        // Données pour l'application
         private List<WatchedFolder> watchedFolders = new List<WatchedFolder>();
+        private List<WatchedFile> watchedFiles = new List<WatchedFile>();
+
+        // Éléments UI
         private BindingSource watchedFoldersBinding = new BindingSource();
 
         private Icon notifyNothingIcon;
@@ -27,7 +31,7 @@ namespace FileLookout
             InitializeComponent();
 
             // Fenêtre des informations.
-            informationForm = new InfoForm(watchedFolders);
+            informationForm = new InfoForm(watchedFolders, watchedFiles);
             informationForm.Hide();
 
             // Connecte les données avec l'affichage des répertoires.
@@ -93,7 +97,7 @@ namespace FileLookout
         // This delegate enables asynchronous calls for processing Directory events.
         delegate void DirectoryWatcherEventDelegate(object sender, FileSystemEventArgs e);
 
-        // Appelé lors de la détection de la création s'un fichier.
+        // Appelé lors de la détection de la création d'un fichier.
         private void folderWatcherObect_Created(object sender, FileSystemEventArgs e)
         {
             if (this.InvokeRequired)
@@ -105,13 +109,21 @@ namespace FileLookout
             {
                 UpdateSystemTrayIconTextAndIcon();
 
+                var newFile = new WatchedFile {
+                    Path = e.FullPath,
+                    DateDetected = DateTime.Now,
+                    DirectoryWatched = ((FileSystemWatcher)sender).Path
+                };
+                watchedFiles.Add(newFile);
+
                 // Faire apparaître une notification temporaire.
-                String filepath = System.IO.Path.GetDirectoryName(e.FullPath);
-                String filename = System.IO.Path.GetFileName(e.FullPath);
+                //      String filepath = System.IO.Path.GetDirectoryName(e.FullPath);
+                //      String filename = System.IO.Path.GetFileName(e.FullPath);
 
                 String title = "Nouveaux fichiers";
-                String message = String.Format("De nouveaux fichiers sont apparus dans le répertoire {0}.\n\n{1}",
-                    filepath, filename);
+                String message = String.Format(
+                    "De nouveaux fichiers sont apparus dans le répertoire {0}.\n\n{1}",
+                    newFile.DirectoryName, newFile.FileName);
 
                 notifyIcon.ShowBalloonTip(0, title, message, ToolTipIcon.Info);
 
