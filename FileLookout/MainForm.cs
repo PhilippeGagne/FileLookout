@@ -24,7 +24,21 @@ namespace FileLookout
         private Icon notifySomethingIcon;
         // TODO: icone interrogation quand le répertoire n'est pas spécifié ou n'existe pas.
 
+        // Type de notification
+        public enum NotificationType {
+            NoNotification = 0,
+            TemporaryNotification = 1,
+            PermanentNotification = 2
+        };
+        private NotificationType notificationType = NotificationType.TemporaryNotification;
+
+        // Cacher la fenêtre au démarrage.
+        private bool hideFormOnStartup = false;
+
+        // Fenêtre d'information (liste des répertoires observés)
         private InfoForm informationForm = null;
+
+        private NotificationForm permanentNotificationForm = null;
 
         public MainForm()
         {
@@ -42,16 +56,65 @@ namespace FileLookout
             notifyNothingIcon = ((System.Drawing.Icon)(Properties.Resources.FileLookoutIcon));
             notifySomethingIcon = ((System.Drawing.Icon)(Properties.Resources.FileLookoutExclamationIcon));
 
+            hideFormOnStartup = Properties.Settings.Default.hideFormOnStartup;
+            AutoHideOnStartup.Checked = hideFormOnStartup;
+            if (hideFormOnStartup)
+                Visible = false;
+            else
+            {
+                //Opacity = 100;
+                //ShowInTaskbar = true;
+                Visible = true;
+            }
+
+            // Répertoires observés
             foreach (var folder in Properties.Settings.Default.watchedFolders)
             {
                 AddFolderToWatchList(folder);
             }
             UpdateData();
 
+            // Radios buttons
+            if (Properties.Settings.Default.notificationType == NotificationType.NoNotification.ToString() )
+            {
+                notificationType = NotificationType.NoNotification;
+                NoNotificationCheck.Checked = true;
+            }
+            else if (Properties.Settings.Default.notificationType == NotificationType.TemporaryNotification.ToString())
+            {
+                notificationType = NotificationType.TemporaryNotification;
+                TemporaryNotificationCheck.Checked = true;
+            }
+            else if (Properties.Settings.Default.notificationType == NotificationType.PermanentNotification.ToString())
+            {
+                notificationType = NotificationType.PermanentNotification;
+                PermanentNotificationCheck.Checked = true;
+            }
+            else
+            {
+                notificationType = NotificationType.TemporaryNotification;
+                TemporaryNotificationCheck.Checked = true;
+            }
+
             notifyIcon.Icon = notifyNothingIcon;
             notifyIcon.Visible = true;
 
             UpdateSystemTrayIconTextAndIcon();
+        }
+
+        /// <summary>
+        /// On va avoir une seule fenêtre toujours ouverte. L'usager de la
+        /// ferme pas mais il la cache.
+        /// </summary>
+        /// <param name="e"></param>
+        protected override void OnFormClosing(FormClosingEventArgs e)
+        {
+            base.OnFormClosing(e);
+            if (e.CloseReason == CloseReason.UserClosing)
+            {
+                e.Cancel = true;
+                Hide();
+            }
         }
 
         /// <summary>
@@ -109,6 +172,7 @@ namespace FileLookout
             {
                 UpdateSystemTrayIconTextAndIcon();
 
+                // Prend en note le fichier ajouté.
                 var newFile = new WatchedFile {
                     Path = e.FullPath,
                     DateDetected = DateTime.Now,
@@ -116,17 +180,30 @@ namespace FileLookout
                 };
                 watchedFiles.Add(newFile);
 
-                // Faire apparaître une notification temporaire.
-                //      String filepath = System.IO.Path.GetDirectoryName(e.FullPath);
-                //      String filename = System.IO.Path.GetFileName(e.FullPath);
+                if (notificationType == NotificationType.TemporaryNotification)
+                {
+                    // Faire apparaître une notification temporaire.
+                    String title = "Nouveaux fichiers";
+                    String message = String.Format(
+                        "De nouveaux fichiers sont apparus dans le répertoire {0}.\n\n{1}",
+                        newFile.DirectoryName, newFile.FileName);
 
-                String title = "Nouveaux fichiers";
-                String message = String.Format(
-                    "De nouveaux fichiers sont apparus dans le répertoire {0}.\n\n{1}",
-                    newFile.DirectoryName, newFile.FileName);
-
-                notifyIcon.ShowBalloonTip(0, title, message, ToolTipIcon.Info);
-
+                    notifyIcon.ShowBalloonTip(0, title, message, ToolTipIcon.Info);
+                }
+                else if (notificationType == NotificationType.PermanentNotification)
+                {
+                    if (permanentNotificationForm==null)
+                    {
+                        permanentNotificationForm = new NotificationForm();
+                        permanentNotificationForm.AddFile(newFile);
+                        permanentNotificationForm.ShowDialog();
+                    }
+                    else
+                    {
+                        permanentNotificationForm.AddFile(newFile);
+                    }
+                }
+               
                 // Mise à jour des informations affichées.
                 UpdateData();
             }
@@ -150,7 +227,9 @@ namespace FileLookout
 
         private void notifyIcon_Click(object sender, EventArgs e)
         {
-            ShowInfoWindow();
+            // On doit faire la différence entre les boutons de la souris.
+            if (((MouseEventArgs)e).Button == MouseButtons.Left)
+                ShowInfoWindow();
         }
 
         /// <summary>
@@ -211,32 +290,24 @@ namespace FileLookout
             // Mise à jour des informations.
             UpdateData();
 
+            MakeFormVisible(informationForm);
+        }
+
+        private void MakeFormVisible(Form f)
+        {
             // S'assure que la fenêtre est visible.
-            FormWindowState previousWindowState = informationForm.WindowState;
+            FormWindowState previousWindowState = f.WindowState;
 
             if (previousWindowState == FormWindowState.Minimized)
-                informationForm.WindowState = FormWindowState.Normal;
+                f.WindowState = FormWindowState.Normal;
 
-            //            informationForm.WindowState = FormWindowState.Minimized;
-            informationForm.Show();
-            informationForm.Activate();
-
-//            informationForm.WindowState = FormWindowState.Normal;
-
-//            if (previousWindowState == FormWindowState.Maximized)
-//                informationForm.WindowState = FormWindowState.Maximized;
-
-            // get our current "TopMost" value (ours will always be false though)
-//            bool top = informationForm.TopMost;
-            // make our form jump to the top of everything
-//            informationForm.TopMost = true;
-            // set it back to whatever it was
- //           informationForm.TopMost = top;
+            //            f.WindowState = FormWindowState.Minimized;
+            f.Show();
+            f.Activate();
         }
 
         private void CheckButton_Click(object sender, EventArgs e)
         {
-            UpdateSystemTrayIconTextAndIcon();
             ShowInfoWindow();
         }
 
@@ -269,6 +340,9 @@ namespace FileLookout
 
         private void SaveParameters()
         {
+            Properties.Settings.Default.hideFormOnStartup = hideFormOnStartup;
+
+            // Les répertoires observés.
             Properties.Settings.Default.watchedFolders.Clear();
 
             foreach (var folder in watchedFolders)
@@ -276,7 +350,59 @@ namespace FileLookout
                 Properties.Settings.Default.watchedFolders.Add(folder.Path);
             }
 
+            // Le type de notification
+            Properties.Settings.Default.notificationType = notificationType.ToString();
+
+            // Sauvegarde.
             Properties.Settings.Default.Save();
+        }
+
+        private void ShowInformationMenuItem_Click(object sender, EventArgs e)
+        {
+            ShowInfoWindow();
+        }
+
+        private void ShowConfigurationMenuItem_Click(object sender, EventArgs e)
+        {
+            MakeFormVisible(this);
+        }
+
+        private void ExitApplicationMenuItem_Click(object sender, EventArgs e)
+        {
+            // On doit passer par Exit puisqu'on trappe le close et qu'on l'a transformé
+            // en Hide.
+            Application.Exit();
+        }
+
+        private void CheckTimer_Tick(object sender, EventArgs e)
+        {
+//            UpdateSystemTrayIconTextAndIcon();
+        }
+
+        
+        private void NoNotificationCheck_Click(object sender, EventArgs e)
+        {
+            notificationType = NotificationType.NoNotification;
+            SaveParameters();
+        }
+
+        private void AutoHideOnStartup_CheckedChanged(object sender, EventArgs e)
+        {
+            hideFormOnStartup = AutoHideOnStartup.Checked;
+            SaveParameters();
+        }
+
+        private void TemporaryNotificationCheck_Click(object sender, EventArgs e)
+        {
+            notificationType = NotificationType.TemporaryNotification;
+            SaveParameters();
+        }
+
+        private void PermanentNotificationCheck_Click(object sender, EventArgs e)
+        {
+            notificationType = NotificationType.PermanentNotification;
+            SaveParameters();
+
         }
     }
 }

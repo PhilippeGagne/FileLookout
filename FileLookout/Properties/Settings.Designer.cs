@@ -35,5 +35,29 @@ namespace FileLookout.Properties {
                 this["watchedFolders"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("\"\"")]
+        public string notificationType {
+            get {
+                return ((string)(this["notificationType"]));
+            }
+            set {
+                this["notificationType"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool hideFormOnStartup {
+            get {
+                return ((bool)(this["hideFormOnStartup"]));
+            }
+            set {
+                this["hideFormOnStartup"] = value;
+            }
+        }
     }
 }
