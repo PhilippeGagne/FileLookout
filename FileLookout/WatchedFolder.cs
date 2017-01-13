@@ -59,20 +59,20 @@ namespace FileLookout
 
                 if (nbrFiles == 0)
                 {
-                    return String.Format("{0} (aucun fichier)", Path, nbrFiles);
+                    return string.Format("{0} (aucun fichier)", Path);
                 }
                 else if (nbrFiles == 1)
                 {
-                    return String.Format("{0} (1 fichier)", Path, nbrFiles);
+                    return string.Format("{0} (1 fichier)", Path);
                 }
                 else if (nbrFiles > 1)
                 {
-                    return String.Format("{0} ({1} fichiers)", Path, nbrFiles);
+                    return string.Format("{0} ({1} fichiers)", Path, nbrFiles);
                 }
                 else
                 {
                     // On ne devrait jamais passer par ici.
-                    return String.Format("{0} (erreur: {1} fichiers)", Path, nbrFiles);
+                    return string.Format("{0} (erreur: {1} fichiers)", Path, nbrFiles);
                 }
             }
         }

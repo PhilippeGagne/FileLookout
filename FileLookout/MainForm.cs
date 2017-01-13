@@ -38,6 +38,7 @@ namespace FileLookout
         // Fenêtre d'information (liste des répertoires observés)
         private InfoForm informationForm = null;
 
+        // Fenêtre pour la notification «permanente». On la créée la première fois qu'on en a besoin.
         private NotificationForm permanentNotificationForm = null;
 
         public MainForm()
@@ -99,6 +100,13 @@ namespace FileLookout
             notifyIcon.Icon = notifyNothingIcon;
             notifyIcon.Visible = true;
 
+            permanentNotificationForm = new NotificationForm();
+            // Il faut la faire apparaître, sinon tout va tout croche (on dirait qu'elle
+            // est maal gérée par Windows. On a cependant overidé NotificationForm::SetVisibleCore
+            // pour qu'elle reste invisible le premier «Show».
+            permanentNotificationForm.Show();
+
+
             UpdateSystemTrayIconTextAndIcon();
         }
 
@@ -109,6 +117,8 @@ namespace FileLookout
         /// <param name="e"></param>
         protected override void OnFormClosing(FormClosingEventArgs e)
         {
+            SaveParameters();
+
             base.OnFormClosing(e);
             if (e.CloseReason == CloseReason.UserClosing)
             {
@@ -137,10 +147,7 @@ namespace FileLookout
             {
                 AddFolderToWatchList(fbd.SelectedPath);
                 UpdateData();
-
-                //// Sauvegarde des paramètres
-                SaveParameters();
-            }
+           }
         }
 
         private void DeleteFolderButton_Click(object sender, EventArgs e)
@@ -163,13 +170,15 @@ namespace FileLookout
         // Appelé lors de la détection de la création d'un fichier.
         private void folderWatcherObect_Created(object sender, FileSystemEventArgs e)
         {
-            if (this.InvokeRequired)
+            if (watchedFolderList.InvokeRequired)
             {
                 DirectoryWatcherEventDelegate d = new DirectoryWatcherEventDelegate(folderWatcherObect_Created);
-                this.Invoke(d, new object[] { sender, e });
+                Invoke(d, new object[] { sender, e });
             }
             else
             {
+                Debug.Assert(!InvokeRequired);
+
                 UpdateSystemTrayIconTextAndIcon();
 
                 // Prend en note le fichier ajouté.
@@ -192,16 +201,7 @@ namespace FileLookout
                 }
                 else if (notificationType == NotificationType.PermanentNotification)
                 {
-                    if (permanentNotificationForm==null)
-                    {
-                        permanentNotificationForm = new NotificationForm();
-                        permanentNotificationForm.AddFile(newFile);
-                        permanentNotificationForm.ShowDialog();
-                    }
-                    else
-                    {
-                        permanentNotificationForm.AddFile(newFile);
-                    }
+                    permanentNotificationForm.AddFile(newFile);
                 }
                
                 // Mise à jour des informations affichées.
@@ -383,26 +383,21 @@ namespace FileLookout
         private void NoNotificationCheck_Click(object sender, EventArgs e)
         {
             notificationType = NotificationType.NoNotification;
-            SaveParameters();
         }
 
         private void AutoHideOnStartup_CheckedChanged(object sender, EventArgs e)
         {
             hideFormOnStartup = AutoHideOnStartup.Checked;
-            SaveParameters();
         }
 
         private void TemporaryNotificationCheck_Click(object sender, EventArgs e)
         {
             notificationType = NotificationType.TemporaryNotification;
-            SaveParameters();
         }
 
         private void PermanentNotificationCheck_Click(object sender, EventArgs e)
         {
             notificationType = NotificationType.PermanentNotification;
-            SaveParameters();
-
         }
     }
 }
