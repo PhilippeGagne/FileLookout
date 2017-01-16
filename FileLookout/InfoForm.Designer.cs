@@ -33,10 +33,9 @@
             this.WatchedFoldersLabel = new System.Windows.Forms.Label();
             this.WarchedFilesLabel = new System.Windows.Forms.Label();
             this.FileEventsDataView = new System.Windows.Forms.DataGridView();
+            this.DateDetected = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.DirectoryWatched = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.pathDataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.dateDetectedDataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.fileNameDataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.directoryNameDataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.watchedFileBindingSource = new System.Windows.Forms.BindingSource(this.components);
             ((System.ComponentModel.ISupportInitialize)(this.FileEventsDataView)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.watchedFileBindingSource)).BeginInit();
@@ -75,6 +74,7 @@
             // FileEventsDataView
             // 
             this.FileEventsDataView.AllowUserToAddRows = false;
+            this.FileEventsDataView.AllowUserToDeleteRows = false;
             this.FileEventsDataView.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
@@ -82,42 +82,41 @@
             this.FileEventsDataView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.FileEventsDataView.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.pathDataGridViewTextBoxColumn,
-            this.dateDetectedDataGridViewTextBoxColumn,
-            this.fileNameDataGridViewTextBoxColumn,
-            this.directoryNameDataGridViewTextBoxColumn});
+            this.DateDetected,
+            this.DirectoryWatched});
             this.FileEventsDataView.DataSource = this.watchedFileBindingSource;
             this.FileEventsDataView.Location = new System.Drawing.Point(16, 278);
             this.FileEventsDataView.Name = "FileEventsDataView";
+            this.FileEventsDataView.ReadOnly = true;
             this.FileEventsDataView.RowTemplate.Height = 24;
             this.FileEventsDataView.Size = new System.Drawing.Size(1027, 224);
             this.FileEventsDataView.TabIndex = 4;
-            this.FileEventsDataView.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.FileEventsDataView_CellContentClick);
+            this.FileEventsDataView.CellContentDoubleClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.FileEventsDataView_CellContentDoubleClick);
+            // 
+            // DateDetected
+            // 
+            this.DateDetected.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
+            this.DateDetected.DataPropertyName = "DateDetected";
+            this.DateDetected.HeaderText = "Date";
+            this.DateDetected.Name = "DateDetected";
+            this.DateDetected.ReadOnly = true;
+            this.DateDetected.Width = 67;
+            // 
+            // DirectoryWatched
+            // 
+            this.DirectoryWatched.DataPropertyName = "DirectoryWatched";
+            this.DirectoryWatched.HeaderText = "Répertoire";
+            this.DirectoryWatched.MinimumWidth = 25;
+            this.DirectoryWatched.Name = "DirectoryWatched";
+            this.DirectoryWatched.ReadOnly = true;
             // 
             // pathDataGridViewTextBoxColumn
             // 
+            this.pathDataGridViewTextBoxColumn.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
             this.pathDataGridViewTextBoxColumn.DataPropertyName = "Path";
-            this.pathDataGridViewTextBoxColumn.HeaderText = "Path";
+            this.pathDataGridViewTextBoxColumn.HeaderText = "Nom";
             this.pathDataGridViewTextBoxColumn.Name = "pathDataGridViewTextBoxColumn";
-            // 
-            // dateDetectedDataGridViewTextBoxColumn
-            // 
-            this.dateDetectedDataGridViewTextBoxColumn.DataPropertyName = "DateDetected";
-            this.dateDetectedDataGridViewTextBoxColumn.HeaderText = "DateDetected";
-            this.dateDetectedDataGridViewTextBoxColumn.Name = "dateDetectedDataGridViewTextBoxColumn";
-            // 
-            // fileNameDataGridViewTextBoxColumn
-            // 
-            this.fileNameDataGridViewTextBoxColumn.DataPropertyName = "FileName";
-            this.fileNameDataGridViewTextBoxColumn.HeaderText = "FileName";
-            this.fileNameDataGridViewTextBoxColumn.Name = "fileNameDataGridViewTextBoxColumn";
-            this.fileNameDataGridViewTextBoxColumn.ReadOnly = true;
-            // 
-            // directoryNameDataGridViewTextBoxColumn
-            // 
-            this.directoryNameDataGridViewTextBoxColumn.DataPropertyName = "DirectoryName";
-            this.directoryNameDataGridViewTextBoxColumn.HeaderText = "DirectoryName";
-            this.directoryNameDataGridViewTextBoxColumn.Name = "directoryNameDataGridViewTextBoxColumn";
-            this.directoryNameDataGridViewTextBoxColumn.ReadOnly = true;
+            this.pathDataGridViewTextBoxColumn.ReadOnly = true;
             // 
             // watchedFileBindingSource
             // 
@@ -147,10 +146,12 @@
         private System.Windows.Forms.Label WatchedFoldersLabel;
         private System.Windows.Forms.Label WarchedFilesLabel;
         private System.Windows.Forms.DataGridView FileEventsDataView;
-        private System.Windows.Forms.DataGridViewTextBoxColumn pathDataGridViewTextBoxColumn;
+        private System.Windows.Forms.BindingSource watchedFileBindingSource;
         private System.Windows.Forms.DataGridViewTextBoxColumn dateDetectedDataGridViewTextBoxColumn;
         private System.Windows.Forms.DataGridViewTextBoxColumn fileNameDataGridViewTextBoxColumn;
         private System.Windows.Forms.DataGridViewTextBoxColumn directoryNameDataGridViewTextBoxColumn;
-        private System.Windows.Forms.BindingSource watchedFileBindingSource;
+        private System.Windows.Forms.DataGridViewTextBoxColumn pathDataGridViewTextBoxColumn;
+        private System.Windows.Forms.DataGridViewTextBoxColumn DateDetected;
+        private System.Windows.Forms.DataGridViewTextBoxColumn DirectoryWatched;
     }
 }

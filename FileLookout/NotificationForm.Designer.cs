@@ -71,6 +71,7 @@
             this.dataGridView1.RowTemplate.Height = 24;
             this.dataGridView1.Size = new System.Drawing.Size(637, 248);
             this.dataGridView1.TabIndex = 1;
+            this.dataGridView1.CellContentDoubleClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView1_CellContentDoubleClick);
             // 
             // fileNameDataGridViewTextBoxColumn
             // 
@@ -113,6 +114,7 @@
             this.Controls.Add(this.OkButton);
             this.Name = "NotificationForm";
             this.Text = "NotificationForm";
+            this.TopMost = true;
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.FilesDetectedBinding)).EndInit();
             this.ResumeLayout(false);

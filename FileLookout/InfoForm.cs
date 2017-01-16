@@ -13,6 +13,8 @@ namespace FileLookout
 {
     public partial class InfoForm : Form
     {
+        delegate void UpdateDataDelegate();
+
         private List<WatchedFolder> watchedFolders;
         private BindingSource watchedFoldersBinding = new BindingSource();
 
@@ -46,8 +48,16 @@ namespace FileLookout
 
         public void UpdateData()
         {
-            watchedFoldersBinding.ResetBindings(false);
-            watchedFilesBinding.ResetBindings(false);
+            if (InvokeRequired)
+            {
+                UpdateDataDelegate d = new UpdateDataDelegate(UpdateData);
+                Invoke(d);
+            }
+            else
+            {
+                watchedFoldersBinding.ResetBindings(false);
+                watchedFilesBinding.ResetBindings(false);
+            }
         }
 
         /// <summary>
@@ -65,9 +75,9 @@ namespace FileLookout
             }
         }
 
-        private void FileEventsDataView_CellContentClick(object sender, DataGridViewCellEventArgs e)
+        private void FileEventsDataView_CellContentDoubleClick(object sender, DataGridViewCellEventArgs e)
         {
-
+            watchedFiles[e.RowIndex].OpenDir();
         }
     }
 }

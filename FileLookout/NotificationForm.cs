@@ -79,6 +79,11 @@ namespace FileLookout
             Close();
         }
 
+        private void dataGridView1_CellContentDoubleClick(object sender, DataGridViewCellEventArgs e)
+        {
+            fileNotifications[e.RowIndex].OpenDir();
+        }
+
         //private void MakeFormVisible(Form f)
         //{
         //    // S'assure que la fenêtre est visible.
