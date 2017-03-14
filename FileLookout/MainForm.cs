@@ -102,10 +102,13 @@ namespace FileLookout
 
             permanentNotificationForm = new NotificationForm();
             // Il faut la faire apparaître, sinon tout va tout croche (on dirait qu'elle
-            // est maal gérée par Windows. On a cependant overidé NotificationForm::SetVisibleCore
+            // est mal gérée par Windows. On a cependant overidé NotificationForm::SetVisibleCore
             // pour qu'elle reste invisible le premier «Show».
             permanentNotificationForm.Show();
 
+            // Ajuste le délais pour le rappel.
+            TimeDelayUpDown.Value = Properties.Settings.Default.recallDelay;
+            permanentNotificationForm.RecallTimer.Interval = 60 * 1000 * (int)TimeDelayUpDown.Value;
 
             UpdateSystemTrayIconTextAndIcon();
         }
@@ -352,6 +355,10 @@ namespace FileLookout
 
             // Le type de notification
             Properties.Settings.Default.notificationType = notificationType.ToString();
+
+            // Ajuste le délais pour le rappel.
+            Properties.Settings.Default.recallDelay = (int) TimeDelayUpDown.Value;
+            permanentNotificationForm.RecallTimer.Interval = 60 * 1000 * (int)TimeDelayUpDown.Value;
 
             // Sauvegarde.
             Properties.Settings.Default.Save();

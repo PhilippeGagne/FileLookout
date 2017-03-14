@@ -50,13 +50,17 @@
             this.PermanentNotificationCheck = new System.Windows.Forms.RadioButton();
             this.TemporaryNotificationCheck = new System.Windows.Forms.RadioButton();
             this.NoNotificationCheck = new System.Windows.Forms.RadioButton();
-            this.watchedFolderModelBindingSource = new System.Windows.Forms.BindingSource(this.components);
             this.AutoHideOnStartup = new System.Windows.Forms.CheckBox();
+            this.watchedFolderModelBindingSource = new System.Windows.Forms.BindingSource(this.components);
+            this.TimeDelayUpDown = new System.Windows.Forms.NumericUpDown();
+            this.label1 = new System.Windows.Forms.Label();
+            this.label2 = new System.Windows.Forms.Label();
             this.SystemTrayContextMenu.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.folderWatcherObect)).BeginInit();
             this.MenuPrincipal.SuspendLayout();
             this.NotificationSelectionGroup.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.watchedFolderModelBindingSource)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.TimeDelayUpDown)).BeginInit();
             this.SuspendLayout();
             // 
             // notifyIcon
@@ -76,31 +80,31 @@
             this.toolStripSeparator1,
             this.ExitApplicationMenuItem});
             this.SystemTrayContextMenu.Name = "SystemTrayContextMenu";
-            this.SystemTrayContextMenu.Size = new System.Drawing.Size(170, 82);
+            this.SystemTrayContextMenu.Size = new System.Drawing.Size(207, 100);
             // 
             // ShowInformationMenuItem
             // 
             this.ShowInformationMenuItem.Name = "ShowInformationMenuItem";
-            this.ShowInformationMenuItem.Size = new System.Drawing.Size(169, 24);
+            this.ShowInformationMenuItem.Size = new System.Drawing.Size(206, 30);
             this.ShowInformationMenuItem.Text = "Informations";
             this.ShowInformationMenuItem.Click += new System.EventHandler(this.ShowInformationMenuItem_Click);
             // 
             // ShowConfigurationMenuItem
             // 
             this.ShowConfigurationMenuItem.Name = "ShowConfigurationMenuItem";
-            this.ShowConfigurationMenuItem.Size = new System.Drawing.Size(169, 24);
+            this.ShowConfigurationMenuItem.Size = new System.Drawing.Size(206, 30);
             this.ShowConfigurationMenuItem.Text = "Configuration";
             this.ShowConfigurationMenuItem.Click += new System.EventHandler(this.ShowConfigurationMenuItem_Click);
             // 
             // toolStripSeparator1
             // 
             this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(166, 6);
+            this.toolStripSeparator1.Size = new System.Drawing.Size(203, 6);
             // 
             // ExitApplicationMenuItem
             // 
             this.ExitApplicationMenuItem.Name = "ExitApplicationMenuItem";
-            this.ExitApplicationMenuItem.Size = new System.Drawing.Size(169, 24);
+            this.ExitApplicationMenuItem.Size = new System.Drawing.Size(206, 30);
             this.ExitApplicationMenuItem.Text = "Quitter";
             this.ExitApplicationMenuItem.Click += new System.EventHandler(this.ExitApplicationMenuItem_Click);
             // 
@@ -114,17 +118,18 @@
             // WatchedFolderLabel
             // 
             this.WatchedFolderLabel.AutoSize = true;
-            this.WatchedFolderLabel.Location = new System.Drawing.Point(13, 13);
+            this.WatchedFolderLabel.Location = new System.Drawing.Point(15, 16);
             this.WatchedFolderLabel.Name = "WatchedFolderLabel";
-            this.WatchedFolderLabel.Size = new System.Drawing.Size(112, 17);
+            this.WatchedFolderLabel.Size = new System.Drawing.Size(126, 20);
             this.WatchedFolderLabel.TabIndex = 0;
             this.WatchedFolderLabel.Text = "Watched Folder:";
             // 
             // AddFolderButton
             // 
-            this.AddFolderButton.Location = new System.Drawing.Point(12, 143);
+            this.AddFolderButton.Location = new System.Drawing.Point(14, 179);
+            this.AddFolderButton.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.AddFolderButton.Name = "AddFolderButton";
-            this.AddFolderButton.Size = new System.Drawing.Size(113, 33);
+            this.AddFolderButton.Size = new System.Drawing.Size(127, 41);
             this.AddFolderButton.TabIndex = 2;
             this.AddFolderButton.Text = "Ajouter";
             this.AddFolderButton.UseVisualStyleBackColor = true;
@@ -134,18 +139,20 @@
             // 
             this.watchedFolderList.DisplayMember = "Path";
             this.watchedFolderList.FormattingEnabled = true;
-            this.watchedFolderList.ItemHeight = 16;
-            this.watchedFolderList.Location = new System.Drawing.Point(12, 37);
+            this.watchedFolderList.ItemHeight = 20;
+            this.watchedFolderList.Location = new System.Drawing.Point(14, 46);
+            this.watchedFolderList.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.watchedFolderList.Name = "watchedFolderList";
-            this.watchedFolderList.Size = new System.Drawing.Size(380, 100);
+            this.watchedFolderList.Size = new System.Drawing.Size(427, 124);
             this.watchedFolderList.TabIndex = 4;
             this.watchedFolderList.ValueMember = "Path";
             // 
             // DeleteFolderButton
             // 
-            this.DeleteFolderButton.Location = new System.Drawing.Point(295, 143);
+            this.DeleteFolderButton.Location = new System.Drawing.Point(332, 179);
+            this.DeleteFolderButton.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.DeleteFolderButton.Name = "DeleteFolderButton";
-            this.DeleteFolderButton.Size = new System.Drawing.Size(97, 33);
+            this.DeleteFolderButton.Size = new System.Drawing.Size(109, 41);
             this.DeleteFolderButton.TabIndex = 5;
             this.DeleteFolderButton.Text = "Retirer";
             this.DeleteFolderButton.UseVisualStyleBackColor = true;
@@ -162,7 +169,8 @@
             this.fenêtreDinformationToolStripMenuItem});
             this.MenuPrincipal.Location = new System.Drawing.Point(0, 0);
             this.MenuPrincipal.Name = "MenuPrincipal";
-            this.MenuPrincipal.Size = new System.Drawing.Size(404, 28);
+            this.MenuPrincipal.Padding = new System.Windows.Forms.Padding(7, 2, 0, 2);
+            this.MenuPrincipal.Size = new System.Drawing.Size(454, 33);
             this.MenuPrincipal.TabIndex = 6;
             this.MenuPrincipal.Text = "menuStrip1";
             // 
@@ -173,25 +181,25 @@
             this.toolStripSeparator2,
             this.quitterToolStripMenuItem});
             this.fenêtreDinformationToolStripMenuItem.Name = "fenêtreDinformationToolStripMenuItem";
-            this.fenêtreDinformationToolStripMenuItem.Size = new System.Drawing.Size(58, 24);
+            this.fenêtreDinformationToolStripMenuItem.Size = new System.Drawing.Size(69, 29);
             this.fenêtreDinformationToolStripMenuItem.Text = "Menu";
             // 
             // informationsToolStripMenuItem
             // 
             this.informationsToolStripMenuItem.Name = "informationsToolStripMenuItem";
-            this.informationsToolStripMenuItem.Size = new System.Drawing.Size(168, 26);
+            this.informationsToolStripMenuItem.Size = new System.Drawing.Size(199, 30);
             this.informationsToolStripMenuItem.Text = "Informations";
             this.informationsToolStripMenuItem.Click += new System.EventHandler(this.ShowInformationMenuItem_Click);
             // 
             // toolStripSeparator2
             // 
             this.toolStripSeparator2.Name = "toolStripSeparator2";
-            this.toolStripSeparator2.Size = new System.Drawing.Size(165, 6);
+            this.toolStripSeparator2.Size = new System.Drawing.Size(196, 6);
             // 
             // quitterToolStripMenuItem
             // 
             this.quitterToolStripMenuItem.Name = "quitterToolStripMenuItem";
-            this.quitterToolStripMenuItem.Size = new System.Drawing.Size(168, 26);
+            this.quitterToolStripMenuItem.Size = new System.Drawing.Size(199, 30);
             this.quitterToolStripMenuItem.Text = "Quitter";
             this.quitterToolStripMenuItem.Click += new System.EventHandler(this.ExitApplicationMenuItem_Click);
             // 
@@ -200,9 +208,11 @@
             this.NotificationSelectionGroup.Controls.Add(this.PermanentNotificationCheck);
             this.NotificationSelectionGroup.Controls.Add(this.TemporaryNotificationCheck);
             this.NotificationSelectionGroup.Controls.Add(this.NoNotificationCheck);
-            this.NotificationSelectionGroup.Location = new System.Drawing.Point(17, 214);
+            this.NotificationSelectionGroup.Location = new System.Drawing.Point(19, 244);
+            this.NotificationSelectionGroup.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.NotificationSelectionGroup.Name = "NotificationSelectionGroup";
-            this.NotificationSelectionGroup.Size = new System.Drawing.Size(374, 62);
+            this.NotificationSelectionGroup.Padding = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.NotificationSelectionGroup.Size = new System.Drawing.Size(421, 78);
             this.NotificationSelectionGroup.TabIndex = 7;
             this.NotificationSelectionGroup.TabStop = false;
             this.NotificationSelectionGroup.Text = "Notification";
@@ -210,9 +220,10 @@
             // PermanentNotificationCheck
             // 
             this.PermanentNotificationCheck.AutoSize = true;
-            this.PermanentNotificationCheck.Location = new System.Drawing.Point(217, 22);
+            this.PermanentNotificationCheck.Location = new System.Drawing.Point(244, 28);
+            this.PermanentNotificationCheck.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.PermanentNotificationCheck.Name = "PermanentNotificationCheck";
-            this.PermanentNotificationCheck.Size = new System.Drawing.Size(106, 21);
+            this.PermanentNotificationCheck.Size = new System.Drawing.Size(121, 24);
             this.PermanentNotificationCheck.TabIndex = 2;
             this.PermanentNotificationCheck.TabStop = true;
             this.PermanentNotificationCheck.Text = "Permanente";
@@ -222,9 +233,10 @@
             // TemporaryNotificationCheck
             // 
             this.TemporaryNotificationCheck.AutoSize = true;
-            this.TemporaryNotificationCheck.Location = new System.Drawing.Point(90, 21);
+            this.TemporaryNotificationCheck.Location = new System.Drawing.Point(113, 28);
+            this.TemporaryNotificationCheck.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.TemporaryNotificationCheck.Name = "TemporaryNotificationCheck";
-            this.TemporaryNotificationCheck.Size = new System.Drawing.Size(102, 21);
+            this.TemporaryNotificationCheck.Size = new System.Drawing.Size(114, 24);
             this.TemporaryNotificationCheck.TabIndex = 1;
             this.TemporaryNotificationCheck.TabStop = true;
             this.TemporaryNotificationCheck.Text = "Temporaire";
@@ -234,35 +246,80 @@
             // NoNotificationCheck
             // 
             this.NoNotificationCheck.AutoSize = true;
-            this.NoNotificationCheck.Location = new System.Drawing.Point(7, 22);
+            this.NoNotificationCheck.Location = new System.Drawing.Point(8, 28);
+            this.NoNotificationCheck.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.NoNotificationCheck.Name = "NoNotificationCheck";
-            this.NoNotificationCheck.Size = new System.Drawing.Size(77, 21);
+            this.NoNotificationCheck.Size = new System.Drawing.Size(89, 24);
             this.NoNotificationCheck.TabIndex = 0;
             this.NoNotificationCheck.TabStop = true;
             this.NoNotificationCheck.Text = "Aucune";
             this.NoNotificationCheck.UseVisualStyleBackColor = true;
             this.NoNotificationCheck.Click += new System.EventHandler(this.NoNotificationCheck_Click);
             // 
-            // watchedFolderModelBindingSource
-            // 
-            this.watchedFolderModelBindingSource.DataSource = typeof(FileLookout.WatchedFolder);
-            // 
             // AutoHideOnStartup
             // 
             this.AutoHideOnStartup.AutoSize = true;
-            this.AutoHideOnStartup.Location = new System.Drawing.Point(22, 296);
+            this.AutoHideOnStartup.Location = new System.Drawing.Point(25, 370);
+            this.AutoHideOnStartup.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.AutoHideOnStartup.Name = "AutoHideOnStartup";
-            this.AutoHideOnStartup.Size = new System.Drawing.Size(232, 21);
+            this.AutoHideOnStartup.Size = new System.Drawing.Size(260, 24);
             this.AutoHideOnStartup.TabIndex = 8;
             this.AutoHideOnStartup.Text = "Cacher la fenêtre au démarrage";
             this.AutoHideOnStartup.UseVisualStyleBackColor = true;
             this.AutoHideOnStartup.CheckedChanged += new System.EventHandler(this.AutoHideOnStartup_CheckedChanged);
             // 
+            // watchedFolderModelBindingSource
+            // 
+            this.watchedFolderModelBindingSource.DataSource = typeof(FileLookout.WatchedFolder);
+            // 
+            // TimeDelayUpDown
+            // 
+            this.TimeDelayUpDown.Location = new System.Drawing.Point(179, 330);
+            this.TimeDelayUpDown.Maximum = new decimal(new int[] {
+            120,
+            0,
+            0,
+            0});
+            this.TimeDelayUpDown.Minimum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            this.TimeDelayUpDown.Name = "TimeDelayUpDown";
+            this.TimeDelayUpDown.Size = new System.Drawing.Size(120, 26);
+            this.TimeDelayUpDown.TabIndex = 9;
+            this.TimeDelayUpDown.Value = new decimal(new int[] {
+            30,
+            0,
+            0,
+            0});
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(33, 332);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(131, 20);
+            this.label1.TabIndex = 10;
+            this.label1.Text = "Délais de rappel :";
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(311, 332);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(69, 20);
+            this.label2.TabIndex = 11;
+            this.label2.Text = "minutes.";
+            // 
             // MainForm
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(404, 340);
+            this.ClientSize = new System.Drawing.Size(454, 425);
+            this.Controls.Add(this.label2);
+            this.Controls.Add(this.label1);
+            this.Controls.Add(this.TimeDelayUpDown);
             this.Controls.Add(this.AutoHideOnStartup);
             this.Controls.Add(this.NotificationSelectionGroup);
             this.Controls.Add(this.MenuPrincipal);
@@ -270,6 +327,7 @@
             this.Controls.Add(this.watchedFolderList);
             this.Controls.Add(this.AddFolderButton);
             this.Controls.Add(this.WatchedFolderLabel);
+            this.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.Name = "MainForm";
             this.Text = "FileLookout";
             this.SystemTrayContextMenu.ResumeLayout(false);
@@ -279,6 +337,7 @@
             this.NotificationSelectionGroup.ResumeLayout(false);
             this.NotificationSelectionGroup.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.watchedFolderModelBindingSource)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.TimeDelayUpDown)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -309,6 +368,9 @@
         private System.Windows.Forms.RadioButton TemporaryNotificationCheck;
         private System.Windows.Forms.RadioButton NoNotificationCheck;
         private System.Windows.Forms.CheckBox AutoHideOnStartup;
+        private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.NumericUpDown TimeDelayUpDown;
     }
 }
 

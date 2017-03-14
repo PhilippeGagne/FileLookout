@@ -59,5 +59,17 @@ namespace FileLookout.Properties {
                 this["hideFormOnStartup"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("30")]
+        public int recallDelay {
+            get {
+                return ((int)(this["recallDelay"]));
+            }
+            set {
+                this["recallDelay"] = value;
+            }
+        }
     }
 }

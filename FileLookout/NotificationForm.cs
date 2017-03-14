@@ -35,7 +35,7 @@ namespace FileLookout
         }
 
         /// <summary>
-        /// On va avoir une seule fenêtre toujours ouverte. L'usager de la
+        /// On va avoir une seule fenêtre toujours ouverte. L'usager ne la
         /// ferme pas mais il la cache.
         /// 
         /// En même temps on efface la liste des avertissements.
@@ -43,8 +43,8 @@ namespace FileLookout
         /// <param name="e"></param>
         protected override void OnFormClosing(FormClosingEventArgs e)
         {
-            fileNotifications.Clear();
-            FilesDetectedBinding.ResetBindings(false);
+//            fileNotifications.Clear();
+//            FilesDetectedBinding.ResetBindings(false);
 
             base.OnFormClosing(e);
             if (e.CloseReason == CloseReason.UserClosing)
@@ -64,6 +64,10 @@ namespace FileLookout
             }
             else
             {
+                // On aura pas besoin du timer de recall, s'il est en fonction, puisqu'on
+                // va popper la fenêtre.
+                RecallTimer.Enabled = false;
+
                 Show();
                 Activate();
                 //MakeFormVisible(this);
@@ -76,12 +80,32 @@ namespace FileLookout
 
         private void OkButton_Click(object sender, EventArgs e)
         {
+            // Vide la liste des fichiers.
+
+            fileNotifications.Clear();
+            FilesDetectedBinding.ResetBindings(false);
+
             Close();
         }
 
         private void dataGridView1_CellContentDoubleClick(object sender, DataGridViewCellEventArgs e)
         {
             fileNotifications[e.RowIndex].OpenDir();
+        }
+
+        private void RecallTimer_Tick(object sender, EventArgs e)
+        {
+            RecallTimer.Enabled = false;
+
+            // Par définition, l'appel sera sur le thread GUI.
+            Show();
+            Activate();
+        }
+
+        private void LaterButton_Click(object sender, EventArgs e)
+        {
+            RecallTimer.Enabled = true;
+            Close();
         }
 
         //private void MakeFormVisible(Form f)
