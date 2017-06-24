@@ -167,6 +167,52 @@ namespace FileLookout
             SaveParameters();
         }
 
+        // Appelé lors de la détection de la création d'un fichier.
+        private void manualFolderCheck(string path)
+        {
+            Debug.Assert(!InvokeRequired);
+
+            UpdateSystemTrayIconTextAndIcon();
+
+            string[] fileEntries = Directory.GetFiles(path);
+            string[] dirEntries = Directory.GetDirectories(path);
+            List<string> allEntries = fileEntries.ToList();
+            foreach (string a in dirEntries)
+            {
+                allEntries.Add(a + Path.DirectorySeparatorChar);
+            }
+
+            foreach (string filename in allEntries)
+            {
+                // Prend en note le fichier ajouté.
+                var newFile = new WatchedFile
+                {
+                    Path = filename,
+                    DateDetected = DateTime.Now,
+                    DirectoryWatched = path
+                };
+                watchedFiles.Add(newFile);
+                if (notificationType == NotificationType.PermanentNotification)
+                {
+                    permanentNotificationForm.AddFile(newFile);
+                }
+            }
+
+            if (allEntries.Count()>0 && notificationType == NotificationType.TemporaryNotification)
+            {
+                // Faire apparaître une notification temporaire.
+                String title = "Fichiers détectés";
+                String message = String.Format(
+                    "Le répertoire {0} contient des fichiers.", path);
+
+                notifyIcon.ShowBalloonTip(0, title, message, ToolTipIcon.Info);
+            }
+
+            // Mise à jour des informations affichées.
+            UpdateData();
+        }
+
+    
         // This delegate enables asynchronous calls for processing Directory events.
         delegate void DirectoryWatcherEventDelegate(object sender, FileSystemEventArgs e);
 
@@ -184,11 +230,16 @@ namespace FileLookout
 
                 UpdateSystemTrayIconTextAndIcon();
 
+                string watchedPath = ((FileSystemWatcher)sender).Path;
+                string file = e.FullPath;
+                if (Directory.Exists(file))
+                    file = file + Path.DirectorySeparatorChar;
+
                 // Prend en note le fichier ajouté.
                 var newFile = new WatchedFile {
-                    Path = e.FullPath,
+                    Path = file,
                     DateDetected = DateTime.Now,
-                    DirectoryWatched = ((FileSystemWatcher)sender).Path
+                    DirectoryWatched = watchedPath
                 };
                 watchedFiles.Add(newFile);
 
@@ -331,11 +382,13 @@ namespace FileLookout
                 newWatchedFolder = new WatchedFolder { Path = path };
                 watchedFolders.Add(newWatchedFolder);
 
-                // TODO: aller dans une fonction newWatchedFolder ?
                 newWatchedFolder.WatcherObject.Filter = "*.*";
                 newWatchedFolder.WatcherObject.Created += new FileSystemEventHandler(folderWatcherObect_Created);
                 newWatchedFolder.WatcherObject.Deleted += new FileSystemEventHandler(folderWatcherObect_Deleted);
                 newWatchedFolder.WatcherObject.EnableRaisingEvents = true;
+
+                // Checks for already existing files.
+                manualFolderCheck(path);
             }
 
             return newWatchedFolder;
